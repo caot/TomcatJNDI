@@ -1,11 +1,12 @@
 package hthurow.tomcatjndi;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.deploy.ContextResource;
-
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+
+import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleEvent;
+//import org.apache.catalina.deploy.ContextResource;
+import org.apache.tomcat.util.descriptor.web.ContextResource;
 
 /**
  * @author Holger Thurow (thurow.h@gmail.com)

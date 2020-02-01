@@ -1,23 +1,33 @@
 package hthurow.tomcatjndi;
 
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.Server;
-import org.apache.catalina.core.*;
-import org.apache.catalina.deploy.*;
-import org.apache.catalina.startup.Catalina;
-import org.apache.catalina.startup.ContextRuleSet;
-import org.apache.catalina.startup.NamingRuleSet;
-import org.apache.catalina.startup.WebRuleSet;
-import org.apache.tomcat.util.digester.Digester;
-import org.xml.sax.SAXException;
-
-import javax.naming.Context;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.naming.Context;
+
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.Server;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardEngine;
+import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.core.StandardService;
+import org.apache.catalina.deploy.NamingResourcesImpl;
+import org.apache.catalina.startup.Catalina;
+import org.apache.catalina.startup.ContextRuleSet;
+import org.apache.catalina.startup.NamingRuleSet;
+import org.apache.tomcat.util.descriptor.web.ContextEjb;
+import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
+import org.apache.tomcat.util.descriptor.web.ContextResource;
+import org.apache.tomcat.util.descriptor.web.WebRuleSet;
+import org.apache.tomcat.util.descriptor.web.WebXml;
+//import org.apache.catalina.startup.WebRuleSet;
+import org.apache.tomcat.util.digester.Digester;
+import org.xml.sax.SAXException;
 
 /*
  * TODO Ensure correct files are provided to {@link #processDefaultWebXml(File)}, {@link #processHostWebXml(File)}, {@link #processServerXml(File)}, {@link #processWebXml(File)} and {@link #processContextXml(File)}.<br>
@@ -36,7 +46,7 @@ import java.util.Objects;
 public class TomcatJNDI {
 
     private static final String URL_PKG_PREFIX = "org.apache.naming";
-    private NamingResources namingResources;
+    private NamingResourcesImpl namingResources;
     private org.apache.catalina.core.NamingContextListener namingContextListener;
     private Server server;
     private StandardContext standardContext;
@@ -79,7 +89,7 @@ See also javax.naming.spi.NamingManager.getURLContext() */
             }
             service.setServer(server);
             standardEngine.setService(service);
-            namingResources = new NamingResources();
+            namingResources = new NamingResourcesImpl();
             standardContext.setNamingResources(namingResources);
             namingContextListener = new NamingContextListener();
             namingContextListener.setName("TomcatJNDI");
@@ -142,7 +152,7 @@ See also javax.naming.spi.NamingManager.getURLContext() */
     }
 
     private void initializeGlobalNamingContext() {
-        NamingResources globalNamingResources = server.getGlobalNamingResources();
+        NamingResourcesImpl globalNamingResources = server.getGlobalNamingResources();
         globalNamingContextListener = new NamingContextListener();
         globalNamingResources.addPropertyChangeListener(globalNamingContextListener);
         globalNamingContextListener.setName("TomcatJNDIServer");

@@ -1,14 +1,17 @@
 package hthurow.tomcatjndi;
 
-import org.apache.catalina.Container;
-
 import java.beans.PropertyChangeListener;
+
+import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 
 /**
  * @author Holger Thurow (thurow.h@gmail.com)
  * @since 10.09.17
  */
 class Loader implements org.apache.catalina.Loader {
+    private Context context;
+    
     @Override
     public void backgroundProcess() {
 
@@ -19,15 +22,13 @@ class Loader implements org.apache.catalina.Loader {
         return this.getClass().getClassLoader();
     }
 
-    @Override
-    public Container getContainer() {
-        return null;
-    }
+//    public Container getContainer() {
+//        return null;
+//    }
 
-    @Override
-    public void setContainer(Container container) {
+//    public void setContainer(Container container) {
 
-    }
+//    }
 
     @Override
     public boolean getDelegate() {
@@ -39,10 +40,9 @@ class Loader implements org.apache.catalina.Loader {
 
     }
 
-    @Override
-    public String getInfo() {
-        return null;
-    }
+//    public String getInfo() {
+//        return null;
+//    }
 
     @Override
     public boolean getReloadable() {
@@ -59,15 +59,13 @@ class Loader implements org.apache.catalina.Loader {
 
     }
 
-    @Override
-    public void addRepository(String repository) {
+//    public void addRepository(String repository) {
 
-    }
+//    }
 
-    @Override
-    public String[] findRepositories() {
-        return new String[0];
-    }
+//    public String[] findRepositories() {
+//        return new String[0];
+//    }
 
     @Override
     public boolean modified() {
@@ -78,4 +76,16 @@ class Loader implements org.apache.catalina.Loader {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
 
     }
+
+	@Override
+	public Context getContext() {
+		// TODO Auto-generated method stub
+		return this.context;
+	}
+
+	@Override
+	public void setContext(Context context) {
+		// TODO Auto-generated method stub
+		this.context = context;
+	}
 }

@@ -1,17 +1,14 @@
 package hthurow.tomcatjndi;
 
-import com.dumbster.smtp.MailMessage;
-import com.dumbster.smtp.ServerOptions;
-import com.dumbster.smtp.SmtpServer;
-import com.dumbster.smtp.SmtpServerFactory;
-import junit.framework.AssertionFailedError;
-import org.apache.catalina.users.MemoryUserDatabase;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import resources.JavaBean;
-import resources.SelfDefinedResource;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -23,12 +20,21 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
 import javax.sql.DataSource;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
-import static org.junit.Assert.*;
+import org.apache.catalina.users.MemoryUserDatabase;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.dumbster.smtp.MailMessage;
+import com.dumbster.smtp.ServerOptions;
+import com.dumbster.smtp.SmtpServer;
+import com.dumbster.smtp.SmtpServerFactory;
+
+import junit.framework.AssertionFailedError;
+import resources.JavaBean;
+import resources.SelfDefinedResource;
 
 /**
  *
@@ -92,7 +98,7 @@ public class TomcatJndiTest {
         }
         finally {
             if (statement != null) {
-                statement.executeQuery("DROP TABLE MY_TABLE");
+                statement.executeUpdate("DROP TABLE MY_TABLE");
                 statement.close();
                 connection.close();
             }
@@ -289,7 +295,7 @@ public class TomcatJndiTest {
     }
 
     /**
-     * "Where the same resource name has been defined for a <env‐entry> element included in the web application deployment descriptor (/WEB‐INF/web.xml) and in an <Environment> element as part of the <Context> element for the web application, the values in the deployment descriptor will take precedence only if allowed by the corresponding <Environment> element (by setting the override attribute to "true")."
+     * "Where the same resource name has been defined for a <env-entry> element included in the web application deployment descriptor (/WEB-INF/web.xml) and in an <Environment> element as part of the <Context> element for the web application, the values in the deployment descriptor will take precedence only if allowed by the corresponding <Environment> element (by setting the override attribute to "true")."
      * <p>
      * JNDI Resources HOW-TO - Apache Tomcat 8.0.pdf
      */
@@ -341,13 +347,25 @@ public class TomcatJndiTest {
         Connection connection = ds.getConnection();
         Statement statement = connection.createStatement();
         try {
-            statement.executeUpdate("CREATE TABLE MY_TABLE" +
-                    " (NAME VARCHAR(254))");
-            statement.executeUpdate("INSERT INTO MY_TABLE (NAME) VALUES ('test')");
-            ResultSet resultSet = statement.executeQuery("SELECT count(*) FROM MY_TABLE");
-            resultSet.next();
-            int rowCount = resultSet.getInt(1);
-            assertEquals(1, rowCount);
+
+            DatabaseMetaData dbm = connection.getMetaData();
+            // check if "employee" table is there
+            ResultSet tables = dbm.getTables(null, null, "MY_TABLE", null);
+            if (tables.next()) {
+                // Table exists
+                System.out.println("Table [MY_TABLE] exists");
+        		assert (true);
+            } else {
+                // Table does not exist
+                System.out.println("Table [MY_TABLE] does not exist");
+
+                statement.executeUpdate("CREATE TABLE MY_TABLE" + " (NAME VARCHAR(254))");
+                statement.executeUpdate("INSERT INTO MY_TABLE (NAME) VALUES ('test')");
+                ResultSet resultSet = statement.executeQuery("SELECT count(*) FROM MY_TABLE");
+                resultSet.next();
+                int rowCount = resultSet.getInt(1);
+                assertEquals(1, rowCount);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -355,7 +373,7 @@ public class TomcatJndiTest {
         }
         finally {
             if (statement != null) {
-                statement.executeQuery("DROP TABLE MY_TABLE");
+        		statement.executeUpdate("DROP TABLE MY_TABLE");
                 statement.close();
                 connection.close();
             }
